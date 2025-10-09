@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEngine.UI.Image;
+ï»¿using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -37,7 +34,7 @@ public class PlayerMove : MonoBehaviour
         Vector3 move = new Vector3(h, 0, v);
         transform.Translate(move * speed * Time.deltaTime, Space.World);
 
-        // ¿òÁ÷ÀÏ ¶§ ÀÏÁ¤ ½Ã°£¸¶´Ù ¼Ò¸® ¹ß»ı
+        // ì›€ì§ì¼ ë•Œ ì¼ì • ì‹œê°„ë§ˆë‹¤ ì†Œë¦¬ ë°œìƒ
         if (moveKeyDown) movetime += Time.deltaTime;
         if (movetime >= 0.5f)
         {
@@ -61,45 +58,48 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    void noiseRay(Vector3 pos , float radius, float deptm, int rayCount ,float intensity)
+    void noiseRay(Vector3 pos, float radius, float deptm, int rayCount, float intensity)
     {
-
         if (deptm <= 0 || intensity <= 0.1f)
             return;
-     
 
         for (int i = 0; i < rayCount; i++)
         {
-            Vector3 sRay = Random.onUnitSphere; //±¸ÀÇ Ç¥¸é¿¡ ÀÖ´Â Á¡À» ÀÓÀÇ·Î ¼±ÅÃÇÏ¿© ¹İÈ¯ÇÕ´Ï´Ù. Áï ·£´ı À§Ä¡·Î ¹İÈ¯
-            if (sRay.y < 0)
-                continue;
-           
-            if (Physics.Raycast(pos, sRay ,out RaycastHit hit , enemyLayer | wallLayer))
+            Vector3 sRay = Random.onUnitSphere; //êµ¬ì˜ í‘œë©´ì— ìˆëŠ” ì ì„ ì„ì˜ë¡œ ì„ íƒí•˜ì—¬ ë°˜í™˜í•©ë‹ˆë‹¤. ì¦‰ ëœë¤ ìœ„ì¹˜ë¡œ ë°˜í™˜
+            if (sRay.y < 0) continue;
+
+            if (Physics.Raycast(pos, sRay, out RaycastHit hit, radius, enemyLayer | wallLayer))
             {
-                Debug.DrawRay(pos, sRay * hit.distance, Color.yellow, 0.5f);
+                Debug.DrawRay(pos, sRay * hit.distance, Color.red, 5f);
+
                 EnemyMove enemy = hit.collider.GetComponent<EnemyMove>();
                 if (enemy != null)
-                {
                     enemy.GetPoint(pos);
-                }
 
-                if(((hit.collider.gameObject.layer) == wallLayer ) && deptm > 0)
+                // ë°˜ì‚¬ ì²˜ë¦¬
+                if (((1 << hit.collider.gameObject.layer) & wallLayer) != 0 && deptm > 0)
                 {
-                    Vector3 reRay = Vector3.Reflect(pos, hit.normal); //Reflect ->¹éÅÍ¸¦ ¹İ»ç½ÃÅ°´Â ÇÔ¼ö
-                    float reInten = intensity / 2;
-                    noiseRay(pos + sRay * 0.1f, radius * 0.7f, deptm - 1, rayCount / 2, reInten);
+                    Vector3 reRay = Vector3.Reflect(sRay, hit.normal); //Reflect ->ë°±í„°ë¥¼ ë°˜ì‚¬ì‹œí‚¤ëŠ” í•¨ìˆ˜
+                    float reInten = intensity / 2f;
+
+                    Debug.DrawRay(hit.point, reRay * (radius * 0.7f), Color.green, 5f);
+
+                    noiseRay(hit.point + reRay * 0.2f, radius * 0.7f, deptm - 1, 1, reInten);
                 }
             }
+            else
+            {
+                Debug.DrawRay(pos, sRay * radius, Color.blue, 5f);
+            }
         }
-
     }
 
 
 
-    // µğ¹ö±×¿ë Gizmos (¼Ò¸® ¹İ°æ ½Ã°¢È­)
+    // ë””ë²„ê·¸ìš© Gizmos (ì†Œë¦¬ ë°˜ê²½ ì‹œê°í™”)
     void OnDrawGizmos()
     {
-        if (moveKeyDown) // ¿òÁ÷ÀÏ ¶§¸¸ Ç¥½Ã
+        if (moveKeyDown) // ì›€ì§ì¼ ë•Œë§Œ í‘œì‹œ
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, walkNoiseRadius);
