@@ -16,6 +16,7 @@ public class PlayerMove : MonoBehaviour
 
     public float walkNoiseRadius = 3f;
 
+
     void Start()
     {
         characterRigidbody = GetComponent<Rigidbody>();
