@@ -39,7 +39,7 @@ public class PlayerMove : MonoBehaviour
         if (moveKeyDown) movetime += Time.deltaTime;
         if (movetime >= 0.5f)
         {
-            MakeNoise(walkNoiseRadius);
+            //MakeNoise(walkNoiseRadius);
             noiseRay(transform.position, walkNoiseRadius, collisionRayCount, rayCount, 1.0f);
             movetime = 0;
         }
@@ -71,7 +71,7 @@ public class PlayerMove : MonoBehaviour
 
             if (Physics.Raycast(pos, sRay, out RaycastHit hit, radius, enemyLayer | wallLayer))
             {
-                Debug.DrawRay(pos, sRay * hit.distance, Color.red, 5f);
+                Debug.DrawRay(pos, sRay * hit.distance, Color.red, 1f);
 
                 EnemyMove enemy = hit.collider.GetComponent<EnemyMove>();
                 if (enemy != null)
@@ -83,14 +83,14 @@ public class PlayerMove : MonoBehaviour
                     Vector3 reRay = Vector3.Reflect(sRay, hit.normal); //Reflect ->백터를 반사시키는 함수
                     float reInten = intensity / 2f;
 
-                    Debug.DrawRay(hit.point, reRay * (radius * 0.7f), Color.green, 5f);
+                    Debug.DrawRay(hit.point, reRay * (radius * 0.7f), Color.green, 1f);
 
                     noiseRay(hit.point + reRay * 0.2f, radius * 0.7f, deptm - 1, 1, reInten);
                 }
             }
             else
             {
-                Debug.DrawRay(pos, sRay * radius, Color.blue, 5f);
+                Debug.DrawRay(pos, sRay * radius, Color.blue, 1f);
             }
         }
     }
